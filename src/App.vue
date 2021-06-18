@@ -1,14 +1,22 @@
 <template>
-  <Navbar />
+  <Navbar v-model="searchText" />
+  <Weather v-if="!searchText" />
 </template>
 
 <script>
+import { ref } from "vue";
 import Navbar from "./components/Navbar.vue";
+import Weather from "./components/Weather.vue";
 
 export default {
   name: "App",
   components: {
     Navbar,
+    Weather,
+  },
+  setup() {
+    const searchText = ref("");
+    return { searchText };
   },
 };
 </script>
@@ -16,30 +24,34 @@ export default {
 <style>
 @font-face {
   font-family: "Avenir";
-  src: url("./assets/fonts/Avenir/Avenir Regular/Avenir Regular.ttf");
+  src: url("./assets/fonts/Avenir/Avenir Regular/Avenir Regular.ttf")
+    format("truetype");
   font-weight: normal;
 }
 @font-face {
   font-family: "Avenir";
-  src: url("./assets/fonts/Avenir/Avenir Light/Avenir Light.ttf");
-  font-weight: lighter;
+  src: url("./assets/fonts/Avenir/Avenir Light/Avenir Light.ttf")
+    format("truetype");
+  font-weight: 300;
 }
 @font-face {
   font-family: "Avenir";
-  src: url("./assets/fonts/Avenir/Avenir Heavy/Avenir Heavy.ttf");
-  font-weight: bolder;
-}
-@font-face {
-  font-family: "Avenir";
-  src: url("./assets/fonts/Avenir/Avenir Black/Avenir Black.ttf");
+  src: url("./assets/fonts/Avenir/Avenir Heavy/Avenir Heavy.ttf")
+    format("truetype");
   font-weight: bold;
+}
+@font-face {
+  font-family: "Avenir";
+  src: url("./assets/fonts/Avenir/Avenir Black/Avenir Black.ttf")
+    format("truetype");
+  font-weight: 800;
+}
+head,
+body {
+  margin: 0;
+  padding: 0;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
