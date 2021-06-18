@@ -1,20 +1,39 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <Navbar />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Navbar from "./components/Navbar.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    Navbar,
+  },
+};
 </script>
 
 <style>
+@font-face {
+  font-family: "Avenir";
+  src: url("./assets/fonts/Avenir/Avenir Regular/Avenir Regular.ttf");
+  font-weight: normal;
+}
+@font-face {
+  font-family: "Avenir";
+  src: url("./assets/fonts/Avenir/Avenir Light/Avenir Light.ttf");
+  font-weight: lighter;
+}
+@font-face {
+  font-family: "Avenir";
+  src: url("./assets/fonts/Avenir/Avenir Heavy/Avenir Heavy.ttf");
+  font-weight: bolder;
+}
+@font-face {
+  font-family: "Avenir";
+  src: url("./assets/fonts/Avenir/Avenir Black/Avenir Black.ttf");
+  font-weight: bold;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
