@@ -14,6 +14,11 @@ export default {
     Navbar,
     Weather,
   },
+  data() {
+    return {
+      unit: false,
+    };
+  },
   setup() {
     const searchText = ref("");
     return { searchText };
@@ -21,7 +26,9 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+@import "./styles/_globals.scss";
+
 @font-face {
   font-family: "Avenir";
   src: url("./assets/fonts/Avenir/Avenir Regular/Avenir Regular.ttf")
@@ -50,6 +57,9 @@ head,
 body {
   margin: 0;
   padding: 0;
+}
+body {
+  background-color: $divider-color;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
