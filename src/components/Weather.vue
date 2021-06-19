@@ -4,6 +4,10 @@
       <div class="main">
         <div class="city">{{ apiResponse.name }}</div>
         <div class="time">{{ apiResponse.sys.country }} {{ getTime() }}</div>
+        <div class="degrees">{{ apiResponse.main.temp }}°</div>
+        <div class="description">{{ apiResponse.weather[0].main }}</div>
+      </div>
+      <div class="temperature">
         <div class="weather-icon">
           <img
             v-bind:src="
@@ -13,21 +17,25 @@
             "
             alt=""
           />
-          <div class="description">{{ apiResponse.weather[0].main }}</div>
         </div>
-      </div>
-      <div class="temperature">
-        <div class="degrees">31 °</div>
         <div class="highlow">
-          <span class="high"> {{ apiResponse.main.temp_max }} °</span>
+          <span class="high"> {{ apiResponse.main.temp_max }}°</span>
           /
-          <span class="low"> {{ apiResponse.main.temp_min }} °</span>
+          <span class="low"> {{ apiResponse.main.temp_min }}°</span>
         </div>
       </div>
     </div>
     <div class="wind">
       <div class="wind-icon">
-        <img v-bind:src="require('@/assets/icons/line/all/wind-beaufort-' + Math.round(apiResponse.wind.speed) + '.svg')" alt="" srcset="">
+        <img
+          v-bind:src="
+            require('@/assets/icons/line/all/wind-beaufort-' +
+              Math.round(apiResponse.wind.speed) +
+              '.svg')
+          "
+          alt=""
+          srcset=""
+        />
       </div>
     </div>
   </div>
@@ -85,6 +93,7 @@ export default {
         name: "Mountain View",
         cod: 200,
       },
+      unit: "C",
     };
   },
   methods: {
@@ -107,20 +116,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$icon-size: 5em;
+@import "../styles/_globals.scss";
 .Weather {
+  width: 80%;
+  margin: 2em auto;
   .current-weather {
-    background: rgb(2, 0, 36);
-    background: linear-gradient(
-      90deg,
-      rgba(2, 0, 36, 1) 0%,
-      rgba(175, 151, 203, 1) 0%,
-      rgba(0, 212, 255, 1) 100%
-    );
-    padding: 2em;
-    justify-content: space-evenly;
+    &> * {
+      padding: 2em;
+    }
+    background-color: #fafafa;
+    justify-content: space-between;
+    overflow: hidden;
+    border-radius: 25px;
     display: flex;
     .main {
+      background-color: $primary-color;
+      color: $primary-color-text;
+      font-weight: bolder;
       display: flex;
       flex-direction: column;
       .city {
@@ -132,17 +144,13 @@ $icon-size: 5em;
       .time {
         font-weight: lighter;
       }
-      .weather-icon img {
-        width: $icon-size;
-      }
+    }
+    .weather-icon img {
+      width: 10em;
     }
     .temperature {
       height: 100%;
       text-align: left;
-      .degrees {
-        font-size: 5em;
-        font-weight: 300;
-      }
       .highlow {
         text-align: left;
         .high {
@@ -152,6 +160,10 @@ $icon-size: 5em;
           color: blue;
         }
       }
+    }
+    .degrees {
+      font-size: 4em;
+      font-weight: 600;
     }
   }
 }
