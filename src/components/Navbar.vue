@@ -5,12 +5,14 @@
       <input
         type="text"
         placeholder="search"
-        v-model="input"
-        @input="$emit('update:modelValue', $event.target.value)"
+        @input="changeSearchText($event.target.value)"
         autocomplete="off"
         maxlength="100"
+        @keypress.enter="$emit('searchClick')"
       />
-      <span class="material-icons-outlined"> search </span>
+      <span @click="$emit('searchClick')" class="material-icons-outlined">
+        search
+      </span>
     </div>
     <div class="temp-unit">
       <span :class="{ active: !unit }" @click="$emit('tempUnit', false)"
@@ -23,16 +25,17 @@
 </template>
 
 <script>
-import { ref } from "@vue/reactivity";
 export default {
   name: "Navbar",
-  emits: ["tempUnit"],
+  emits: ["tempUnit", "update:modelValue", "searchClick"],
   props: {
     unit: Boolean,
+    searchText: String,
   },
-  setup() {
-    const input = ref("");
-    return { input };
+  methods: {
+    changeSearchText(value) {
+      this.$emit("update:modelValue", value);
+    },
   },
 };
 </script>
