@@ -4,7 +4,7 @@
       <div class="main">
         <div class="city">{{ apiResponse.name }}</div>
         <div class="time">{{ apiResponse.sys.country }} {{ getTime() }}</div>
-        <div class="degrees">{{ apiResponse.main.temp }}°</div>
+        <div class="degrees">{{ Math.round(apiResponse.main.temp) }}°</div>
         <div class="description">{{ apiResponse.weather[0].main }}</div>
       </div>
       <div class="temperature">
@@ -19,18 +19,21 @@
           />
         </div>
         <div class="highlow">
-          <span class="high"> {{ apiResponse.main.temp_max }}°</span>
+          <span class="high">
+            {{ Math.round(apiResponse.main.temp_max) }}°</span
+          >
           /
-          <span class="low"> {{ apiResponse.main.temp_min }}°</span>
+          <span class="low"> {{ Math.round(apiResponse.main.temp_min) }}°</span>
         </div>
       </div>
     </div>
     <div class="wind">
+      <h1>Wind</h1>
       <div class="wind-icon">
         <img
           v-bind:src="
             require('@/assets/icons/line/all/wind-beaufort-' +
-              Math.round(apiResponse.wind.speed) +
+              beaufortScale(apiResponse.wind.speed) +
               '.svg')
           "
           alt=""
@@ -46,6 +49,7 @@ export default {
   name: "Weather",
   props: {
     apiResponse2: Object,
+    unit: Boolean,
   },
   data() {
     return {
@@ -93,7 +97,6 @@ export default {
         name: "Mountain View",
         cod: 200,
       },
-      unit: "C",
     };
   },
   methods: {
@@ -103,6 +106,39 @@ export default {
       let minute = time.getMinutes();
       let s = hour + ":" + minute;
       return s;
+    },
+    beaufortScale(value) {
+      if (this.unit) {
+        // Imperial
+        if (value < 1) return 0;
+        if (value < 4) return 1;
+        if (value < 8) return 2;
+        if (value < 13) return 3;
+        if (value < 19) return 4;
+        if (value < 25) return 5;
+        if (value < 32) return 6;
+        if (value < 39) return 7;
+        if (value < 47) return 8;
+        if (value < 55) return 9;
+        if (value < 64) return 10;
+        if (value < 73) return 11;
+        if (value >= 73) return 12;
+      } else {
+        // Metric
+        if (value < 0.5) return 0;
+        if (value < 1.6) return 1;
+        if (value < 3.4) return 2;
+        if (value < 5.6) return 3;
+        if (value < 8) return 4;
+        if (value < 10.8) return 5;
+        if (value < 13.9) return 6;
+        if (value < 17.2) return 7;
+        if (value < 20.8) return 8;
+        if (value < 24.5) return 9;
+        if (value < 28.5) return 10;
+        if (value < 32.7) return 11;
+        if (value >= 32.7) return 12;
+      }
     },
   },
 };
