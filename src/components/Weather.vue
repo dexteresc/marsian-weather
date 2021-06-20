@@ -1,44 +1,48 @@
 <template>
   <div class="Weather">
     <div class="current-weather">
-      <div class="main">
-        <div class="city">{{ apiResponse.name }}</div>
-        <div class="time">{{ apiResponse.sys.country }} {{ getTime() }}</div>
-        <div class="degrees">{{ Math.round(apiResponse.main.temp) }}°</div>
-        <div class="description">{{ apiResponse.weather[0].main }}</div>
+      <div class="current-temperature">
+        <div class="main">
+          <div class="city">{{ apiResponse.name }}</div>
+          <div class="time">{{ apiResponse.sys.country }} {{ getTime() }}</div>
+          <div class="degrees">{{ Math.round(apiResponse.main.temp) }}°</div>
+          <div class="description">{{ apiResponse.weather[0].main }}</div>
+        </div>
+        <div class="temperature">
+          <div class="weather-icon">
+            <img
+              v-bind:src="
+                require('@/assets/icons/line/openweathermap/' +
+                  apiResponse.weather[0].icon +
+                  '.svg')
+              "
+              alt=""
+            />
+          </div>
+          <div class="highlow">
+            <span class="high">
+              {{ Math.round(apiResponse.main.temp_max) }}°</span
+            >
+            /
+            <span class="low">
+              {{ Math.round(apiResponse.main.temp_min) }}°</span
+            >
+          </div>
+        </div>
       </div>
-      <div class="temperature">
-        <div class="weather-icon">
+      <div class="wind">
+        <h1>Wind</h1>
+        <div class="wind-icon">
           <img
             v-bind:src="
-              require('@/assets/icons/line/openweathermap/' +
-                apiResponse.weather[0].icon +
+              require('@/assets/icons/line/all/wind-beaufort-' +
+                beaufortScale(apiResponse.wind.speed) +
                 '.svg')
             "
             alt=""
+            srcset=""
           />
         </div>
-        <div class="highlow">
-          <span class="high">
-            {{ Math.round(apiResponse.main.temp_max) }}°</span
-          >
-          /
-          <span class="low"> {{ Math.round(apiResponse.main.temp_min) }}°</span>
-        </div>
-      </div>
-    </div>
-    <div class="wind">
-      <h1>Wind</h1>
-      <div class="wind-icon">
-        <img
-          v-bind:src="
-            require('@/assets/icons/line/all/wind-beaufort-' +
-              beaufortScale(apiResponse.wind.speed) +
-              '.svg')
-          "
-          alt=""
-          srcset=""
-        />
       </div>
     </div>
   </div>
@@ -53,6 +57,7 @@ export default {
   },
   data() {
     return {
+      // Testing
       apiResponse: {
         coord: {
           lon: -122.08,
@@ -149,50 +154,54 @@ export default {
 .Weather {
   width: 80%;
   margin: 2em auto;
+  background-color: #fafafa;
+  border-radius: 25px;
+  overflow: hidden;
   .current-weather {
-    & > * {
-      padding: 2em;
-    }
-    background-color: #fafafa;
-    justify-content: space-between;
-    overflow: hidden;
-    border-radius: 25px;
-    display: flex;
-    .main {
-      background-color: $primary-color;
-      color: $primary-color-text;
-      font-weight: bolder;
+    .current-temperature {
+      justify-content: space-between;
       display: flex;
-      flex-direction: column;
-      .city {
-        font-size: 1.5em;
+      & > * {
+        padding: 2em;
       }
-      .country {
-        font-size: 0.8rem;
+      display: flex;
+      .main {
+        border-radius: 25px;
+        background-color: $primary-color;
+        color: $primary-color-text;
+        font-weight: bolder;
+        display: flex;
+        flex-direction: column;
+        .city {
+          font-size: 1.5em;
+        }
+        .country {
+          font-size: 0.8rem;
+        }
+        .time {
+          font-weight: lighter;
+        }
       }
-      .time {
-        font-weight: lighter;
+      .weather-icon img {
+        width: 10em;
       }
-    }
-    .weather-icon img {
-      width: 10em;
-    }
-    .temperature {
-      height: 100%;
-      text-align: left;
-      .highlow {
+      .temperature {
+        height: 100%;
         text-align: left;
-        .high {
-          color: red;
-        }
-        .low {
-          color: blue;
+        .highlow {
+          text-align: left;
+          .high {
+            color: red;
+          }
+          .low {
+            color: blue;
+          }
         }
       }
-    }
-    .degrees {
-      font-size: 4em;
-      font-weight: 600;
+      .degrees {
+        font-size: 4em;
+        font-weight: 600;
+      }
     }
   }
 }

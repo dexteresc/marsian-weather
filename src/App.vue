@@ -5,12 +5,13 @@
     :unit="unit"
     v-on:searchClick="getWeather"
   />
-  <Weather
-    :apiResponse="apiResponse"
-    v-if="apiResponse && apiResponse.cod == 200"
-    :unit="unit"
-  />
-  <div v-else-if="apiResponse && apiResponse.cod != 200">City not found.</div>
+  <Weather :apiResponse="apiResponse" :unit="unit" />
+  <div class="search-error" v-if="apiResponse && apiResponse.cod != 200">
+    City not found.
+  </div>
+  <div v-if="!apiResponse && searchText" class="search-error">
+    "{{ searchText }}" not found
+  </div>
 </template>
 
 <script>
@@ -20,6 +21,7 @@ import Weather from "./components/Weather.vue";
 import apiKey from "./apiKey.json";
 
 export default {
+  // v-if="apiResponse && apiResponse.cod == 200"
   name: "App",
   components: {
     Navbar,
@@ -28,7 +30,7 @@ export default {
   data() {
     return {
       unit: false,
-      apiResponse: {},
+      apiResponse: "",
     };
   },
   setup() {
@@ -43,30 +45,36 @@ export default {
       }
     },
     getWeather() {
-      let sUnit;
-      if (this.unit) {
-        sUnit = "imperial";
+      let searchQuery = this.searchText.trim();
+      console.log(searchQuery);
+      if (searchQuery == "" || /\d/.test(searchQuery)) {
+        return 0;
       } else {
-        sUnit = "metric";
+        let sUnit;
+        if (this.unit) {
+          sUnit = "imperial";
+        } else {
+          sUnit = "metric";
+        }
+        fetch(
+          "https://api.openweathermap.org/data/2.5/weather?q=" +
+            searchQuery +
+            "&appid=" +
+            apiKey.apiKey +
+            "&units=" +
+            sUnit
+        ).then((res) =>
+          res
+            .json()
+            .then((data) => {
+              console.log(data);
+              this.apiResponse = data;
+            })
+            .catch((error) => {
+              console.log(error);
+            })
+        );
       }
-      fetch(
-        "https://api.openweathermap.org/data/2.5/weather?q=" +
-          this.searchText +
-          "&appid=" +
-          apiKey.apiKey +
-          "&units=" +
-          sUnit
-      ).then((res) =>
-        res
-          .json()
-          .then((data) => {
-            console.log(data);
-            this.apiResponse = data;
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-      );
     },
   },
 };
