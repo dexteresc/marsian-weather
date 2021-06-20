@@ -1,6 +1,7 @@
 <template>
-  <Navbar v-model="searchText" />
-  <Weather v-if="!searchText" />
+  <Navbar v-model="searchText" v-on:tempUnit="changeUnit" :unit="unit" />
+  {{searchText}}
+  <Weather />
 </template>
 
 <script>
@@ -22,6 +23,12 @@ export default {
   setup() {
     const searchText = ref("");
     return { searchText };
+  },
+  methods: {
+    changeUnit(tempUnit) {
+      console.log(this.unit, "this ran", tempUnit);
+      this.unit = tempUnit;
+    },
   },
 };
 </script>

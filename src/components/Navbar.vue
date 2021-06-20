@@ -5,7 +5,7 @@
       <input
         type="text"
         placeholder="search"
-        v-model="searchText"
+        v-model="input"
         @input="$emit('update:modelValue', $event.target.value)"
         autocomplete="off"
         maxlength="100"
@@ -13,9 +13,11 @@
       <span class="material-icons-outlined"> search </span>
     </div>
     <div class="temp-unit">
-      <span v-bind:class="{ active: !tempUnit }">C°</span>
+      <span :class="{ active: !unit }" @click="$emit('tempUnit', false)"
+        >C°</span
+      >
       /
-      <span v-bind:class="{ active: tempUnit }">F°</span>
+      <span :class="{ active: unit }" @click="$emit('tempUnit', true)">F°</span>
     </div>
   </nav>
 </template>
@@ -24,13 +26,9 @@
 import { ref } from "@vue/reactivity";
 export default {
   name: "Navbar",
+  emits: ["tempUnit"],
   props: {
     unit: Boolean,
-  },
-  data() {
-    return {
-      tempUnit: false,
-    };
   },
   setup() {
     const input = ref("");
@@ -81,6 +79,7 @@ nav {
     cursor: default;
     color: $divider-color;
     span {
+      cursor: pointer;
       padding: 0 0.2em;
       &.active {
         color: $primary-color-text;

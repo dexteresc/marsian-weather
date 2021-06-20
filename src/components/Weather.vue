@@ -105,13 +105,6 @@ export default {
       return s;
     },
   },
-  created() {
-    console.log(
-      "../assets/icons/line/openweathermap/" +
-        this.apiResponse.weather[0].icon +
-        ".svg"
-    );
-  },
 };
 </script>
 
@@ -121,7 +114,7 @@ export default {
   width: 80%;
   margin: 2em auto;
   .current-weather {
-    &> * {
+    & > * {
       padding: 2em;
     }
     background-color: #fafafa;
