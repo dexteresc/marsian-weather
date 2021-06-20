@@ -1,13 +1,23 @@
 <template>
-  <Navbar v-model="searchText" v-on:tempUnit="changeUnit" :unit="unit" />
-  {{searchText}}
-  <Weather />
+  <Navbar
+    v-model="searchText"
+    v-on:tempUnit="changeUnit"
+    :unit="unit"
+    v-on:searchClick="getWeather"
+  />
+  <Weather
+    :apiResponse="apiResponse"
+    v-if="apiResponse && apiResponse.cod == 200"
+    :unit="unit"
+  />
+  <div v-else-if="apiResponse && apiResponse.cod != 200">City not found.</div>
 </template>
 
 <script>
 import { ref } from "vue";
 import Navbar from "./components/Navbar.vue";
 import Weather from "./components/Weather.vue";
+import apiKey from "./apiKey.json";
 
 export default {
   name: "App",
@@ -18,6 +28,7 @@ export default {
   data() {
     return {
       unit: false,
+      apiResponse: {},
     };
   },
   setup() {
@@ -26,8 +37,36 @@ export default {
   },
   methods: {
     changeUnit(tempUnit) {
-      console.log(this.unit, "this ran", tempUnit);
       this.unit = tempUnit;
+      if (this.searchText) {
+        this.getWeather();
+      }
+    },
+    getWeather() {
+      let sUnit;
+      if (this.unit) {
+        sUnit = "imperial";
+      } else {
+        sUnit = "metric";
+      }
+      fetch(
+        "https://api.openweathermap.org/data/2.5/weather?q=" +
+          this.searchText +
+          "&appid=" +
+          apiKey.apiKey +
+          "&units=" +
+          sUnit
+      ).then((res) =>
+        res
+          .json()
+          .then((data) => {
+            console.log(data);
+            this.apiResponse = data;
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+      );
     },
   },
 };
