@@ -47,9 +47,13 @@
     <main>
       <nav>
         <ul>
-          <li>Today</li>
-          <li>Week</li>
+          <li :class="{ 'tab-active': !tab }">Today</li>
+          <li :class="{ 'tab-active': tab }">Week</li>
         </ul>
+        <div class="units">
+          <div class="unit" :class="{ 'unit-active': !unitActive }">°C</div>
+          <div class="unit" :class="{ 'unit-active': unitActive }">°F</div>
+        </div>
       </nav>
       <div class="weather">
         <div class="container">temperature</div>
@@ -72,6 +76,7 @@ export default {
   },
   data() {
     return {
+      tab: false,
       unit: {
         temp: "C",
         rain: "mm",
@@ -212,12 +217,17 @@ export default {
       }
       return arr;
     },
+    unitActive() {
+      if (this.unit.temp == "C") {
+        return false;
+      } else return true;
+    },
   },
 };
 </script>
 
 <style lang="scss">
-@import "./styles/_globals.scss";
+@import "./styles/~globals.scss";
 
 @font-face {
   font-family: "Avenir";
@@ -248,7 +258,7 @@ body {
   margin: 0;
 }
 body {
-  background-color: $divider-color;
+  background-color: $accent-color;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -280,6 +290,7 @@ body {
         border: 0;
         outline: 0;
         font-size: 1em;
+        padding: 0 0.5em;
       }
     }
   }
@@ -309,11 +320,57 @@ body {
 }
 main {
   flex: 1 1 auto;
+  nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 1em;
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      li {
+        font-weight: bold;
+        margin-right: 1em;
+        color: $accent-text-color;
+      }
+      li.tab-active {
+        border-bottom: #000 solid 2px;
+        color: $primary-text-color;
+      }
+    }
+    .units {
+      display: flex;
+      align-items: center;
+      .unit {
+        cursor: pointer;
+        $unit-size: 40px;
+        margin-left: 1em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: $unit-size;
+        height: $unit-size;
+        border-radius: $unit-size/2;
+
+        color: $primary-text-color;
+        background-color: $primary-color;
+        &.unit-active {
+          color: $primary-color;
+          background-color: $primary-text-color;
+        }
+      }
+    }
+  }
 }
 .container {
   padding: 1em;
   margin: 1em;
-  background-color: #fafafa;
+  background-color: $primary-color;
   border-radius: 15px;
 }
 .divider {
@@ -321,6 +378,6 @@ main {
   display: block;
   width: 100%;
   height: 1px;
-  background-color: $divider-color;
+  background-color: $accent-color;
 }
 </style>
