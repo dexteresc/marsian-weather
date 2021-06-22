@@ -5,22 +5,34 @@
         <div class="search-bar">
           <span class="material-icons-outlined"> search </span>
           <input
-            type="text"
-            v-model="searchText"
-            placeholder="Search for places..."
+              v-model="searchText"
+              placeholder="Search for places..."
+              type="text"
           />
-          <div class="my-location">X</div>
+          <v-button v-if="!myLocation.loading"
+                    :class="{'error': myLocation['my-location-error'], 'active': myLocation['my-location-active']}"
+                    class="accent rounded"
+                    v-on:click="getCurrentLocation"
+          >
+          <span
+              class="material-icons-outlined"
+              :title="myLocation['my-location-error'] ? 'Something' : null"
+          >
+                {{ locationIcon }}
+          </span>
+          </v-button>
+          <div v-if="myLocation.loading">Loading</div>
         </div>
       </header>
       <section class="current-weather">
         <div class="current-weather-icon">
           <img
-            v-bind:src="
+              alt=""
+              v-bind:src="
               require('@/assets/icons/line/openweathermap/' +
                 apiResponse.weather[0].icon +
                 '.svg')
             "
-            alt=""
           />
         </div>
         <div class="current-temperature">
@@ -33,14 +45,14 @@
         <div class="divider"></div>
         <div class="current-weather-properties">
           <CurrentWeatherProperty
-            v-for="(o, key) in getCurrentWeatherProperties"
-            :key="key"
-            v-bind="o"
+              v-for="(o, key) in getCurrentWeatherProperties"
+              :key="key"
+              v-bind="o"
           />
         </div>
       </section>
       <footer>
-        <LocationWidget :location="apiResponse.name" />
+        <LocationWidget :location="apiResponse.name"/>
       </footer>
     </div>
 
@@ -51,14 +63,17 @@
           <li :class="{ 'tab-active': tab }">Week</li>
         </ul>
         <div class="units">
-          <div class="unit" :class="{ 'unit-active': !unitActive }">°C</div>
-          <div class="unit" :class="{ 'unit-active': unitActive }">°F</div>
+          <v-button :class="{ 'primary': !unitActive }" class="unit rounded">°C</v-button>
+          <v-button :class="{ 'primary': unitActive }" class="unit rounded">°F</v-button>
         </div>
       </nav>
-      <div class="weather">
-        <div class="container">temperature</div>
-        <div class="container">Wind</div>
-        <div class="container">{{ searchText }}</div>
+      <div class="weather-highlights">
+        <div class="container">UV Index</div>
+        <div class="container">Wind Status</div>
+        <div class="container">Sunrise & Sunset</div>
+        <div class="container">Humidity</div>
+        <div class="container">Visibility</div>
+        <div class="container">Air Quality</div>
       </div>
     </main>
   </div>
@@ -68,15 +83,24 @@
 import apiKey from "./apiKey.json";
 import CurrentWeatherProperty from "./components/current-weather-property.vue";
 import LocationWidget from "./components/location-widget.vue";
+import Button from "./components/button"
+
 export default {
   name: "App",
   components: {
     CurrentWeatherProperty,
     LocationWidget,
+    'v-button': Button,
   },
   data() {
     return {
       tab: false,
+      myLocation: {
+        coords: "",
+        'my-location-active': false,
+        "my-location-error": false,
+        loading: false,
+      },
       unit: {
         temp: "C",
         rain: "mm",
@@ -134,6 +158,7 @@ export default {
     };
   },
   setup() {
+
     const dayOfWeek = [
       "Sunday",
       "Monday",
@@ -143,46 +168,99 @@ export default {
       "Friday",
       "Saturday",
     ];
-    return { dayOfWeek };
+    return {dayOfWeek};
   },
   mounted() {
     this.date = new Date(this.apiResponse.dt * 1000);
+
   },
   methods: {
-    getWeather() {
-      let searchQuery = this.searchText.trim();
-      console.log(searchQuery);
-      if (searchQuery == "" || /\d/.test(searchQuery)) {
+    getWeatherByCoords(pos) {
+      const crd = pos.coords;
+      console.log('Your current position is:');
+      console.log(`Latitude : ${crd.latitude}`);
+      console.log(`Longitude: ${crd.longitude}`);
+      console.log(`More or less ${crd.accuracy} meters.`);
+    },
+    getWeatherByQuery() {
+      let query;
+      let sUnit;
+      query = this.searchText.trim();
+      if (query === "" || /\d/.test(query)) {
         return 0;
       } else {
-        let sUnit;
         if (this.unit) {
           sUnit = "imperial";
         } else {
           sUnit = "metric";
         }
         fetch(
-          "https://api.openweathermap.org/data/2.5/weather?q=" +
-            searchQuery +
+            "https://api.openweathermap.org/data/2.5/weather?q=" +
+            query +
             "&appid=" +
             apiKey.apiKey +
             "&units=" +
             sUnit
         ).then((res) =>
-          res
-            .json()
-            .then((data) => {
-              console.log(data);
-              this.apiResponse = data;
-            })
-            .catch((error) => {
-              console.log(error);
-            })
+            res
+                .json()
+                .then((data) => {
+                  console.log(data);
+                  this.apiResponse = data;
+                })
+                .catch((error) => {
+                  console.log(error);
+                })
         );
       }
     },
+    getCurrentLocation() {
+      console.log("this ran")
+
+      function report(state) {
+        console.log("Permission " + state)
+      }
+
+      this.myLocation.loading = true;
+
+      navigator.permissions.query({
+        name: 'geolocation',
+      }).then((result) => {
+        if (result.state === 'granted') {
+          report(result.state)
+          this.myLocation["my-location-active"] = true;
+        } else if (result.state === 'prompt') {
+          console.log(this.myLocation.loading)
+          report(result.state);
+          navigator.geolocation.getCurrentPosition(this.getWeatherByCoords)
+
+        } else if (result.state === 'denied') {
+          report(result.state);
+          this.myLocation["my-location-error"] = true
+        }
+        result.onchange = () => {
+          report(result.state);
+          if (result.state === 'denied') {
+            this.myLocation["my-location-error"] = true;
+          }
+        }
+      }).finally(() => {
+        this.myLocation.loading = false
+      })
+
+    },
+
   },
   computed: {
+    locationIcon() {
+      if (this.myLocation["my-location-error"]) {
+        return "location_off"
+      } else if (this.myLocation["my-location-granted"]) {
+        return "location_on";
+      } else {
+        return "location_on"
+      }
+    },
     getTime() {
       return this.date.toLocaleTimeString(navigator.language, {
         hour: "2-digit",
@@ -218,71 +296,77 @@ export default {
       return arr;
     },
     unitActive() {
-      if (this.unit.temp == "C") {
-        return false;
-      } else return true;
+      return this.unit.temp !== "C";
     },
   },
 };
 </script>
 
 <style lang="scss">
-@import "./styles/~globals.scss";
+@import "./styles/_globals.scss";
 
 @font-face {
   font-family: "Avenir";
-  src: url("./assets/fonts/Avenir/Avenir Regular/Avenir Regular.ttf")
-    format("truetype");
+  src: url("./assets/fonts/Avenir/Avenir Regular/Avenir Regular.ttf") format("truetype");
   font-weight: normal;
 }
+
 @font-face {
   font-family: "Avenir";
-  src: url("./assets/fonts/Avenir/Avenir Light/Avenir Light.ttf")
-    format("truetype");
+  src: url("./assets/fonts/Avenir/Avenir Light/Avenir Light.ttf") format("truetype");
   font-weight: 300;
 }
+
 @font-face {
   font-family: "Avenir";
-  src: url("./assets/fonts/Avenir/Avenir Heavy/Avenir Heavy.ttf")
-    format("truetype");
+  src: url("./assets/fonts/Avenir/Avenir Heavy/Avenir Heavy.ttf") format("truetype");
   font-weight: bold;
 }
+
 @font-face {
   font-family: "Avenir";
-  src: url("./assets/fonts/Avenir/Avenir Black/Avenir Black.ttf")
-    format("truetype");
+  src: url("./assets/fonts/Avenir/Avenir Black/Avenir Black.ttf") format("truetype");
   font-weight: 800;
 }
+
 head,
 body {
   margin: 0;
 }
+
 body {
   background-color: $accent-color;
 }
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
 }
+
 .app {
   display: flex;
   min-height: 100vh;
   height: auto;
+
   & > * {
     padding: 2rem;
   }
 }
+
 .sidebar {
   display: flex;
   flex-flow: column;
   box-sizing: border-box;
-  background-color: #fafafa;
+  background-color: $primary-color;
   width: 25%;
+
   header {
     flex: 0 1 auto;
 
     .search-bar {
       display: flex;
       width: 100%;
+      align-items: center;
+
       input {
         flex: 1 1 auto;
         min-width: 0;
@@ -292,34 +376,47 @@ body {
         font-size: 1em;
         padding: 0 0.5em;
       }
-    }
-  }
-  .current-weather {
-    flex: 1 1 auto;
-    display: flex;
-    flex-flow: column;
-    .current-weather-icon {
-      width: 100%;
-    }
-    .current-temperature {
-      font-size: 5em;
-      font-weight: 300;
-      sup {
-        font-size: 0.5em;
-        font-weight: normal;
+
+      &.my-location-active {
+        color: #3f50b5;
       }
     }
-    .current-weather-properties {
-      margin-bottom: 1em;
-    }
-  }
-  footer {
-    flex: 0 1 80px;
-    width: 100%;
   }
 }
+
+.current-weather {
+  flex: 1 1 auto;
+  display: flex;
+  flex-flow: column;
+
+  .current-weather-icon {
+    width: 100%;
+  }
+
+  .current-temperature {
+    font-size: 5em;
+    font-weight: 300;
+
+    sup {
+      font-size: 0.5em;
+      font-weight: normal;
+    }
+  }
+
+  .current-weather-properties {
+    margin-bottom: 1em;
+  }
+}
+
+footer {
+  flex: 0 1 80px;
+  width: 100%;
+}
+
+
 main {
   flex: 1 1 auto;
+
   nav {
     width: 100%;
     display: flex;
@@ -327,52 +424,49 @@ main {
     align-items: center;
     box-sizing: border-box;
     padding: 0 1em;
+
     ul {
       list-style: none;
       padding: 0;
       margin: 0;
       display: flex;
       align-items: center;
+
       li {
         font-weight: bold;
         margin-right: 1em;
         color: $accent-text-color;
       }
+
       li.tab-active {
         border-bottom: #000 solid 2px;
         color: $primary-text-color;
       }
     }
+
     .units {
       display: flex;
       align-items: center;
+
       .unit {
-        cursor: pointer;
         $unit-size: 40px;
-        margin-left: 1em;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        font-size: 1em;
+        margin-left: 1em;;
         width: $unit-size;
         height: $unit-size;
-        border-radius: $unit-size/2;
-
-        color: $primary-text-color;
-        background-color: $primary-color;
-        &.unit-active {
-          color: $primary-color;
-          background-color: $primary-text-color;
-        }
+        border-radius: 50%;
       }
     }
   }
 }
+
 .container {
   padding: 1em;
   margin: 1em;
   background-color: $primary-color;
   border-radius: 15px;
 }
+
 .divider {
   margin: 1em auto;
   display: block;
@@ -380,4 +474,5 @@ main {
   height: 1px;
   background-color: $accent-color;
 }
+
 </style>
