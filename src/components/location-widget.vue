@@ -1,10 +1,10 @@
 <template>
   <div class="location-widget">
     <img
-      :src="
+        :src="
         photoApi.web || require('@/assets/d4452d12509902c3a5b890f653f4fc19.jpg')
       "
-      alt=""
+        alt=""
     />
     <div class="text">{{ location }}</div>
   </div>
@@ -27,25 +27,25 @@ export default {
   methods: {
     getPhoto() {
       fetch(
-        "https://api.teleport.org/api/urban_areas/slug:" +
+          "https://api.teleport.org/api/urban_areas/slug:" +
           this.location.trim().toLowerCase().replace(" ", "-") +
           "/images/"
       )
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            return undefined;
-          }
-        })
-        .then((responseJson) => {
-          if (responseJson.photos) {
-            this.photoApi = responseJson.photos[0].image;
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw Error("Something went wrong...");
+            }
+          })
+          .then((responseJson) => {
+            if (responseJson.photos) {
+              this.photoApi = responseJson.photos[0].image;
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
     },
   },
 };
@@ -54,6 +54,7 @@ export default {
 <style lang="scss" scoped>
 .location-widget {
   position: relative;
+
   img {
     border-radius: 25px;
     width: 100%;
@@ -61,6 +62,7 @@ export default {
     object-fit: cover;
     filter: brightness(80%);
   }
+
   .text {
     position: absolute;
     color: #fff;
