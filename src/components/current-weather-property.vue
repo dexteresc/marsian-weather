@@ -1,6 +1,6 @@
 <template>
   <div class="current-weather-property">
-    <img :src="imgURL" alt="" />
+    <img :src="imgURL" alt=""/>
     <div class="value">{{ value }}{{ unit }}</div>
   </div>
 </template>
@@ -16,7 +16,14 @@ export default {
   computed: {
     imgURL() {
       if (this.icon) {
-        return require("@/assets/icons/line/all/" + this.icon);
+        let i
+        try {
+          i = require("@/assets/icons/line/all/" + this.icon);
+        } catch (e) {
+          console.error(e)
+          i = require("@/assets/icons/line/all/not-available.svg")
+        }
+        return i
       } else return undefined;
     },
   },
@@ -29,6 +36,7 @@ export default {
   align-items: center;
   font-size: 1em;
 }
+
 img {
   width: 2em;
 }
