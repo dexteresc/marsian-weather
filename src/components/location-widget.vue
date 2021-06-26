@@ -21,7 +21,7 @@ export default {
       photoApi: Object,
     };
   },
-  mounted() {
+  created() {
     this.getPhoto();
   },
   methods: {
@@ -46,6 +46,7 @@ export default {
           .catch((error) => {
             console.log(error);
           });
+      console.log("hi")
     },
   },
 };
