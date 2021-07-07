@@ -8,7 +8,7 @@ The the design is purely based upon the design by [Anton Mikhaltsov](https://dri
 
 Here is the [link](https://dribbble.com/shots/10460680-Weather-AppHere) to his design.
 
-## API
+## APIs
 Location photos are fethed from the very kindly provided [Teleport API](https://teleport.org/).
 
 ![Teleport logo](https://developers.teleport.org/assets/logo.e663724a.svg)
