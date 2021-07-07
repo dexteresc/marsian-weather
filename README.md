@@ -16,3 +16,5 @@ Location photos are fethed from the very kindly provided [Teleport API](https://
 The weather is fetched from the weatherapi.com API 
 
 ![WeatherAPI.com logo](https://cdn.weatherapi.com/v4/images/weatherapi_logo.png)
+---
+This App was purely created for an educational purpose, no money is made from this app.
